@@ -21,7 +21,7 @@ subtitle: "走过你的全世界"
 # root of your server.
 # baseurl: "/" # the subpath of your site
 url: "https://techgid.github.io/" # the base hostname & protocol for your site
-baseurl: "/airspace-jekyll"
+#baseurl: "/airspace-jekyll"
 cover: "/assets/cover.png"
 logo: "/assets/logo.png"
 
