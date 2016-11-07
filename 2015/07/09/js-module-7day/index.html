@@ -97,14 +97,14 @@
 
                         
                         <li>
-                            <a href="/tags/">Tags</a>
+                            <a href="/about/">About</a>
                         </li>
                         
                     
 
                         
                         <li>
-                            <a href="/about/">About</a>
+                            <a href="/tags/">Tags</a>
                         </li>
                         
                     
@@ -227,6 +227,32 @@
                 <hr>
 
                 
+                <!-- 多说 Share start -->
+                </style>
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="2015/07/09/js-module-7day/"
+                    data-title="Example Post using Keynote Layout"
+                    data-url="http://techgid.github.io/2015/07/09/js-module-7day/"
+                    data-images="http://techgid.github.io/post-bg-js-version.jpg"
+                    data-content="
+下滑这里查看更多内容
+
+7月9日，我在公司内部进行了名为「JavaScript 模块化七日谈... | 小小行迹 | Jam&#39;s Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
 
                 <ul class="pager">
                     
@@ -238,13 +264,17 @@
                 </ul>
 
                 
-
-                
-                <!-- disqus 评论框 start -->
+                <!-- 多说评论框 start -->
                 <div class="comment">
-                    <div id="disqus_thread" class="disqus-thread"></div>
+                    <div class="ds-thread"
+                        data-thread-key="2015/07/09/js-module-7day/"
+                        data-title="Example Post using Keynote Layout"
+                        data-url="http://techgid.github.io/2015/07/09/js-module-7day/" >
+                    </div>
                 </div>
-                <!-- disqus 评论框 end -->
+                <!-- 多说评论框 end -->
+                
+
                 
 
             </div>
@@ -283,22 +313,25 @@
 </article>
 
 
-
-
-<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = "Jam";
-    var disqus_identifier = "http://techgid.github.io/2015/07/09/js-module-7day/";
-    var disqus_url = "http://techgid.github.io/2015/07/09/js-module-7day/";
+    // dynamic User by Hux
+    var _user = 'jiajia';
 
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
     (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
     })();
 </script>
-<!-- disqus 公共JS代码 end -->
+<!-- 多说公共JS代码 end -->
+
+
 
 
 
