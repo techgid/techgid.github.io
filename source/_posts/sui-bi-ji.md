@@ -2,11 +2,12 @@
 layout:     post
 title:      "随笔记"
 subtitle:   "日常的随身笔记"
-date:       2016-11-26 22:15:00
+date:       2016-11-16 22:15:00
 author:     "Jam"
 header-img: "post-bg-2015.jpg"
 tags:
-    - 日常笔记
+    - 生活笔记
+    - 学习笔记
 ---
 
 > “Yeah It's on. ”

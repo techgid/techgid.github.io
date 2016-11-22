@@ -2,6 +2,7 @@
 title: Team buding
 date: 2016-11-21 22:26:14
 subtitle:   "11月10日聚餐交流记录"
+catalog:    true
 tags:
   -工作
   -团队建设
