@@ -124,3 +124,12 @@ private boolean getFilePathVideoList(String filePath) {
 //f （0.5～2.0）
 mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(f));
 ```
+### SharedPreferences使用
+``` java
+//存入
+SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+mSharedPreferences.edit().putInt("search_position", 1).commit();
+//取出
+SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+int serachIndex = mSharedPreferences.getInt("serach_area_tip", 0);
+```
