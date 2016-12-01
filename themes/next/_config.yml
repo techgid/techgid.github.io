@@ -32,12 +32,12 @@ canonical: true
 # When running the site in a subdirectory (e.g. domain.tld/blog), remove the leading slash (/archives -> archives)
 menu:
   home: /
-  #categories: /categories
-  #about: /about
+  categories: /categories
+  about: /about
   archives: /archives
-  tags: /tags
-  #sitemap: /sitemap.xml
-  #commonweal: /404.html
+  tags: /tag
+  sitemap: /sitemap.xml
+  commonweal: /404.html
 
 
 # Enable/Disable menu icons.
@@ -148,7 +148,7 @@ social_icons:
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-#avatar:
+avatar: http://ofywot861.bkt.clouddn.com/head.jpg
 
 
 # Table Of Contents in the Sidebar
@@ -254,13 +254,13 @@ mathjax:
 
 
 # Swiftype Search API Key
-#swiftype_key:
+swiftype_key: RG9kxrn9XisaPmXNCyz9
 
 # Baidu Analytics ID
 #baidu_analytics:
 
 # Duoshuo ShortName
-#duoshuo_shortname:
+duoshuo_shortname: jiajia
 
 # Disqus
 #disqus_shortname:

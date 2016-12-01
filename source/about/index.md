@@ -4,7 +4,7 @@ title: "About"
 date: 2016-04-21 04:48:33
 description: "Hey, this is Jam."
 header-img: "http://ofywot861.bkt.clouddn.com/header_default_bg.jpg"
-comments: true
+comments: false
 ---
 
 
