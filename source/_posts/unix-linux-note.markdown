@@ -12,7 +12,7 @@ tags:
 ---
 
 > This document is not completed and will be updated anytime.
-
+<!-- more -->
 
 ## Catagory
 

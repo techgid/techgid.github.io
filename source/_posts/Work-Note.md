@@ -10,6 +10,9 @@ tags:
   - 工作笔记
   - 学习笔记
 ---
+> This is work note and will be update anytime.
+<!-- more -->
+
 ### Timer Task hanlder 案例应用
 > 使用timerTask制定定时任务
 

@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------
 
 # Put your favicon.ico into `hexo-site/source/` directory.
-favicon: /favicon.ico
+favicon: /img/favicon.ico
 
 # Set default keywords (Use a comma to separate)
 keywords: "Hexo, NexT"
@@ -127,8 +127,11 @@ font:
 # Social Links
 # Key is the link label showing to end users.
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
-#social:
+social:
   #LinkLabel: Link
+    GitHub: https://github.com/techgid
+    Twitter: https://twitter.com/jamgogo
+    微博: http://weibo.com/jamhu
 
 
 # Social Links Icons
@@ -303,9 +306,9 @@ duoshuo_shortname: jiajia
 # you can visit http://dev.duoshuo.com get duoshuo user id.
 duoshuo_info:
   ua_enable: true
-  admin_enable: false
-  user_id: 0
-  #admin_nickname: Author
+  admin_enable: true
+  user_id: jiajia
+  admin_nickname: Author
 
 
 # Facebook SDK Support.
@@ -457,3 +460,6 @@ images: images
 
 # Theme version
 version: 5.1.0
+
+#站点建立时间
+since: 2016
