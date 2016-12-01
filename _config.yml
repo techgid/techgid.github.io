@@ -6,7 +6,7 @@
 title: Jam's Blog
 subtitle: To Be A Lean Developer!
 author: Jam
-language:
+language: zh-Hans
 timezone:
 
 # URL
@@ -58,7 +58,7 @@ duoshuo_share: true                     # set to false if you want to use Commen
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "我要成为魔法师!"
+sidebar-about-description: "i ++;"
 sidebar-avatar: img/avapic.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
@@ -141,11 +141,11 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: huxblog
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
-deploy: 
+deploy:
   type: git
   repo: https://github.com/techgid/techgid.github.io.git
   branch: master

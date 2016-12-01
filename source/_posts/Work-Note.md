@@ -132,4 +132,66 @@ mSharedPreferences.edit().putInt("search_position", 1).commit();
 //取出
 SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 int serachIndex = mSharedPreferences.getInt("serach_area_tip", 0);
+
+//跨应用取值
+//写入com.test.app
+SharedPreferences preferences = mContext.getSharedPreferences("other_app_tag", Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE|Context.MODE_MULTI_PROCESS);
+Editor editor = preferences.edit();
+editor.putLong("keyword", value);
+editor.clear().commit();
+//取值
+try {
+		Context contextFromGallery = null;
+		contextFromApp = createPackageContext(
+				"com.test.app", MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE | MODE_MULTI_PROCESS);
+		SharedPreferences sp = contextFromApp
+				.getSharedPreferences("other_app_tag",
+						MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE | MODE_MULTI_PROCESS);
+		vaule = sp.getLong("keyword", 0);
+		Log.d(TAG, getUri + " value = " + vaule);
+} catch (Exception e) {
+		Log.d(TAG, "com.test.app Package not found!");
+}
+```
+
+### 格式化文件大小
+``` java
+private static String formateFileSize(long fileSize) {
+DecimalFormat dFormat = new DecimalFormat("#.00");
+String fileSizeString = "";
+String wrongString = "0 B";
+if (fileSize == 0) {
+  return wrongString;
+}
+if (fileSize < 1024) {
+  fileSizeString = dFormat.format((double)fileSize) +" B";
+} else if (fileSize < 1048576) {
+  fileSizeString = dFormat.format((double)fileSize/1024) + " KB";
+} else if (fileSize < 1073741824) {
+  fileSizeString = dFormat.format((double)fileSize/1024/1024) + " MB";
+} else {
+  fileSizeString = dFormat.format((double)fileSize/1024/1024/1024) + " GB";
+}
+return fileSizeString;
+}
+```
+### 格式化时间
+``` java
+public static String formatDuration( int duration) {
+     int h = duration / 3600;
+     int m = (duration - h * 3600) / 60;
+     int s = duration - (h * 3600 + m * 60);
+     String durationValue;
+     String wrongString = "00:00:00";
+     if (duration == 0) {
+   return wrongString;
+ }
+     if (h == 0) {
+         if (m == 0 && s == 0) s = 1;//[BUGFIX]-Modify by TCTNJ,su.jiang, 2016-03-09,PR1759891
+         durationValue = String.format("00:%02d:%02d", m, s);
+     } else {
+         durationValue = String.format("%d:%02d:%02d", h, m, s);
+     }
+     return durationValue;
+ }
 ```
