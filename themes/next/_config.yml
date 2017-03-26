@@ -33,11 +33,11 @@ canonical: true
 menu:
   home: /
   categories: /categories
-  about: /about
-  archives: /archives
+  #archives: /archives
   tags: /tag
-  sitemap: /sitemap.xml
-  commonweal: /404.html
+  about: /about
+  #sitemap: /sitemap.xml
+  #commonweal: /404.html
 
 
 # Enable/Disable menu icons.
