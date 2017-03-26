@@ -149,3 +149,11 @@ deploy:
   type: git
   repo: https://github.com/techgid/techgid.github.io.git
   branch: master
+
+
+algolia:
+  applicationID: 'O5OALVKRKP'
+  apiKey: '35552d6295827ae2d887789bbf951c04'
+  adminApiKey: '2c442b05d08a644ab476da3b62b10f86'
+  indexName: 'JamBolg'
+  chunkSize: 5000

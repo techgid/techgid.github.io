@@ -286,7 +286,7 @@ mathjax:
 
 
 # Swiftype Search API Key
-swiftype_key: RG9kxrn9XisaPmXNCyz9
+#swiftype_key: RG9kxrn9XisaPmXNCyz9
 
 # Baidu Analytics ID
 #baidu_analytics:
@@ -324,11 +324,11 @@ changyan:
 # Available value:
 #    button | slide
 # Warning: Baidu Share does not support https.
-#baidushare:
+#baidushare: false
 ##  type: button
 
 # Share
-#jiathis:
+#jiathis: true
 # Warning: JiaThis does not support https.
 #add_this_id:
 
@@ -433,7 +433,7 @@ baidu_push: false
 # API Documentation:
 # https://developers.google.com/google-apps/calendar/v3/reference/events/list
 calendar:
-  enable: false
+  enable: true
   calendar_id: <required>
   api_key: <required>
   orderBy: startTime
@@ -446,14 +446,13 @@ calendar:
 
 # Algolia Search
 algolia_search:
-  enable: false
+  enable: true
   hits:
     per_page: 10
   labels:
     input_placeholder: Search for Posts
     hits_empty: "We didn't find any results for the search: ${query}"
     hits_stats: "${hits} results found in ${time} ms"
-
 
 # Local search
 local_search:
