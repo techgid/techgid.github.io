@@ -2,7 +2,7 @@
 layout:     post
 title:      "Welcome to Jam Blog"
 subtitle:   " \"Hello World, Hello Blog\""
-date:       2014-01-29 12:00:00
+date:       2016-12-29 12:00:00
 author:     "Jam"
 header-img: "post-bg-2015.jpg"
 categories:

@@ -2,7 +2,7 @@
 layout:     post
 title:      "Example Post with Code Highlight"
 subtitle:   "CommonJS，RequireJS，SeaJS 归纳笔记"
-date:       2013-05-25
+date:       2016-11-25
 author:     "Jam"
 catalog:    true
 header-img: "post-bg-js-module.jpg"

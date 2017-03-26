@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Example Post"
-date:       2014-09-22
+date:       2016-11-22
 author:     "Jam"
 header-img: "post-bg-js-version.jpg"
 categories:
