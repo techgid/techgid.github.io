@@ -304,7 +304,7 @@ disqus:
 #hypercomments_id:
 
 # Gentie productKey
-#gentie_productKey:
+gentie_productKey: 852f2aeb652c410baaa3c8ad8b29f749
 
 # changyan
 changyan:
@@ -532,7 +532,7 @@ vendors:
   # Internal version: 1.0.0
   # https://github.com/hustcc/canvas-nest.js
   canvas_nest:
-  
+
   #three
   three:
   three_waves:
