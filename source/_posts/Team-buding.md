@@ -3,9 +3,11 @@ title: Team buding
 date: 2016-11-21 22:26:14
 subtitle:   "11月10日聚餐交流记录"
 catalog:    true
+categories:
+  - 工作笔记
 tags:
-  -工作
-  -团队建设
+  - 工作
+  - 团队建设
 ---
 
 ### 团队建设 技术提升过程

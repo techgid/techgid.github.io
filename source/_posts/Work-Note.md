@@ -6,6 +6,8 @@ date: 2016-11-22 18:34:39
 catalog:    true
 author:     "Jam"
 header-img: "post-bg-2015.jpg"
+categories:
+  - 工作笔记
 tags:
   - 工作笔记
   - 学习笔记

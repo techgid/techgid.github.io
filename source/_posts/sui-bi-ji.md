@@ -5,6 +5,8 @@ subtitle:   "日常的随身笔记"
 date:       2016-11-16 22:15:00
 author:     "Jam"
 header-img: "post-bg-2015.jpg"
+categories:
+    - 生活笔记
 tags:
     - 生活笔记
     - 学习笔记
