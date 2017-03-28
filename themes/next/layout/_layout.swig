@@ -79,3 +79,8 @@
   {% include '_third-party/exturl.swig' %}
 </body>
 </html>
+<!-- 动态背景 -->
+#默认灰色线条
+<script type="text/javascript" src="/js/src/particle.js"></script>
+#浅蓝色线条
+<script type="text/javascript" src="/js/src/particle.js" count="50" zindex="-2" opacity="1" color="0,104,183"></script>
