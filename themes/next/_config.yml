@@ -534,9 +534,10 @@ vendors:
 
   #three
   three:
-  three_waves:
+  three_waves: true
 
-
+passage_end_tag:
+  enabled: true
 
 # Assets
 css: css

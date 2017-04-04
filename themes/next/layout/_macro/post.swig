@@ -320,6 +320,12 @@
 
     <div>
       {% if not is_index %}
+        {% include 'passage-end-tag.swig' %}
+      {% endif %}
+    </div>
+
+    <div>
+      {% if not is_index %}
         {% include 'reward.swig' %}
       {% endif %}
     </div>
@@ -331,6 +337,7 @@
     </div>
 
     <footer class="post-footer">
+    <!--
       {% if post.tags and post.tags.length and not is_index %}
         <div class="post-tags">
           {% for tag in post.tags %}
@@ -338,6 +345,7 @@
           {% endfor %}
         </div>
       {% endif %}
+      -->
 
       {% if not is_index %}
         {% if (theme.vkontakte_api.enable and theme.vkontakte_api.like) or (theme.facebook_sdk.enable and theme.facebook_sdk.like_button) %}
