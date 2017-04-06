@@ -9,9 +9,9 @@ categories: [图片]
 
 <!-- 标签 方式，要求版本在0.4.5或以上 -->
 {% centerquote %}就像梦一样，醒来后终究归于平静。梦里 寻找你的足迹，走你走过的世界，却始终追不上你的影子。{% endcenterquote %}
+<!-- more -->
 <div align=center>
 <img src="http://ofywot861.bkt.clouddn.com/AQTA5370.jpg" width="700px" />
-<!-- more -->
 <img src="http://ofywot861.bkt.clouddn.com/H:/Images/iPhone20170403/2017-04/YCLS1019.jpg?imageMogr2/w/700/h/500/q/90" width="700px" />
 <img src="http://ofywot861.bkt.clouddn.com/BGHL0165.jpg" width="700px" />
 <img src="http://ofywot861.bkt.clouddn.com/BJHM7201.jpg" width="700px" />
