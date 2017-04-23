@@ -1,7 +1,10 @@
 ---
 title: android mount 简单分析
 date: 2017-04-23 22:47:52
+categories:
+  - 学习笔记
 tags:
+  - Android mount
 ---
 ### 概述
 在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。
