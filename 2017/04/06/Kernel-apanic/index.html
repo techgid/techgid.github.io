@@ -1,0 +1,897 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android kernel," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="kernel apanic介绍apanic属于内核级别的异常，log打印出的是堆栈地址。apanic一般是死机重启的问题，常见空指针（null pointer）或地址加载异常，一般都与cpu稳定性相关。">
+<meta name="keywords" content="Android kernel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kernel apanic（KE） 分析方法">
+<meta property="og:url" content="http://techgid.github.io/2017/04/06/Kernel-apanic/index.html">
+<meta property="og:site_name" content="Jam&#39;s Blog">
+<meta property="og:description" content="kernel apanic介绍apanic属于内核级别的异常，log打印出的是堆栈地址。apanic一般是死机重启的问题，常见空指针（null pointer）或地址加载异常，一般都与cpu稳定性相关。">
+<meta property="og:updated_time" content="2017-07-18T02:09:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Kernel apanic（KE） 分析方法">
+<meta name="twitter:description" content="kernel apanic介绍apanic属于内核级别的异常，log打印出的是堆栈地址。apanic一般是死机重启的问题，常见空指针（null pointer）或地址加载异常，一般都与cpu稳定性相关。">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'O5OALVKRKP',
+      apiKey: '35552d6295827ae2d887789bbf951c04',
+      indexName: 'JamBolg',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://techgid.github.io/2017/04/06/Kernel-apanic/"/>
+
+
+
+
+
+  <title> Kernel apanic（KE） 分析方法 | Jam's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0491134d053ed5de216af5c4bc8c9acb";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jam's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">To Be A Lean Developer!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tag" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://techgid.github.io/2017/04/06/Kernel-apanic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jam">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ofywot861.bkt.clouddn.com/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jam's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Kernel apanic（KE） 分析方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-06T22:13:39+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/06/Kernel-apanic/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="kernel-apanic介绍"><a href="#kernel-apanic介绍" class="headerlink" title="kernel apanic介绍"></a>kernel apanic介绍</h3><p>apanic属于内核级别的异常，log打印出的是堆栈地址。apanic一般是死机重启的问题，常见空指针（null pointer）或地址加载异常，一般都与cpu稳定性相关。</p>
+<a id="more"></a>
+<h3 id="常见的错误类型："><a href="#常见的错误类型：" class="headerlink" title="常见的错误类型："></a>常见的错误类型：</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">Unable <span class="keyword">to</span> handle kernel <span class="literal">NULL</span> pointer dereference at virtual<span class="built_in"> address </span>00000012</div><div class="line">Unable <span class="keyword">to</span> handle kernel paging request at virtual<span class="built_in"> address </span>4042a00c</div></pre></td></tr></table></figure>
+<p>apanic log例如：</p>
+<figure class="highlight inform7"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div></pre></td><td class="code"><pre><div class="line"><span class="comment">[   20.896935]</span> c3 554 (netd) Unable to handle kernel NULL pointer dereference at virtual address 00000012</div><div class="line"><span class="comment">[   20.906200]</span> c3 554 (netd) pgd = ffffffc02f746000</div><div class="line"><span class="comment">[   20.910793]</span> c3 554 (netd) SEH:seh_api_ioctl_handler 7</div><div class="line"><span class="comment">[   20.910793]</span></div><div class="line"><span class="comment">[   20.917357]</span> c3 554 (netd) <span class="comment">[00000012]</span> *pgd=0000000000000000</div><div class="line"><span class="comment">[   20.922798]</span> c3 554 (netd) Internal error: Oops: 96000005 <span class="comment">[#1]</span> PREEMPT SMP</div><div class="line"><span class="comment">[   20.929523]</span> Modules linked in: audiostub cidatattydev gs_modem ccinetdev cci_datastub citty iml_module seh cploaddev msocketk tzdd galcore(O)</div><div class="line"><span class="comment">[   20.942183]</span> c3 554 (netd) CPU: 3 PID: 554 Comm: netd Tainted: G           O 3.10.33 #1</div><div class="line"><span class="comment">[   20.950030]</span> c3 554 (netd) task: ffffffc02e0a0000 ti: ffffffc029b0c000 task.ti: ffffffc029b0c000</div><div class="line"><span class="comment">[   20.958659]</span> c3 554 (netd) PC <span class="keyword">is</span> at __kill_pgrp_info+0x1c/0x84</div><div class="line"><span class="comment">[   20.964360]</span> c3 554 (netd) LR <span class="keyword">is</span> at kill_orphaned_pgrp+0xa4/0xb8</div><div class="line"><span class="comment">[   20.970232]</span> c3 554 (netd) pc : <span class="comment">[&lt;ffffffc0000b39f0&gt;]</span> lr : <span class="comment">[&lt;ffffffc0000a3d10&gt;]</span> pstate: 80000145</div><div class="line"><span class="comment">[   20.978769]</span> c3 554 (netd) sp : ffffffc029b0fc40</div><div class="line"><span class="comment">[   20.983257]</span> R29: ffffffc029b0fc40 R28: ffffffc02e0a0200</div><div class="line"><span class="comment">[   20.988537]</span> R27: 0000000000000001 R26: 00000000fffffff6</div><div class="line"><span class="comment">[   20.993819]</span> R25: ffffffc00072f000 R24: ffffffc029b0fda8</div><div class="line"><span class="comment">[   20.999100]</span> R23: ffffffc029b0c000 R22: 0000000000000001</div><div class="line"><span class="comment">[   21.004381]</span> R21: 0000000000000001 R20: ffffffc029b0fd80</div><div class="line"><span class="comment">[   21.009663]</span> R19: ffffffc02356eb40 R18: 0000000000000000</div><div class="line"><span class="comment">[   21.014935]</span> R17: 0000000000000000 R16: ffffffc000102988</div><div class="line"><span class="comment">[   21.020216]</span> R15: 0000000000000000 R14: 00000000f755fdb7</div><div class="line"><span class="comment">[   21.025497]</span> R13: 00000000f6f0bb78 R12: 0000000000000000</div><div class="line"><span class="comment">[   21.030778]</span> R11: 00000000f6f0bb9c R10: 0000000000000fff</div><div class="line"><span class="comment">[   21.036060]</span> R9 : 00000001ffffffff R8 : 0000000033ffff7f</div><div class="line"><span class="comment">[   21.041342]</span> R7 : 00000000000185ad R6 : ffffffc02f14614c</div><div class="line"><span class="comment">[   21.046623]</span> R5 : 0000000000000000 R4 : 0000000000000000</div><div class="line"><span class="comment">[   21.051903]</span> R3 : ffffffc02f146140 R2 : 0000000000000002</div><div class="line"><span class="comment">[   21.057185]</span> R1 : 0000000000000001 R0 : 0000000000000001</div><div class="line">...</div><div class="line"></div><div class="line">Call Trace:</div><div class="line"><span class="comment">[ef12f700]</span> <span class="comment">[c00081e0]</span> show_stack+0x3c/0x194 (unreliable)</div><div class="line"><span class="comment">[ef12f730]</span> <span class="comment">[c0019b2c]</span> __schedule_bug+0x64/0x78</div><div class="line"><span class="comment">[ef12f750]</span> <span class="comment">[c0350f50]</span> schedule+0x324/0x34c</div><div class="line"><span class="comment">[ef12f7a0]</span> <span class="comment">[c03515c0]</span> schedule_timeout+0x68/0xe4</div><div class="line"><span class="comment">[ef12f7e0]</span> <span class="comment">[c027938c]</span> fsl_elbc_run_command+0x138/0x1c0</div><div class="line"><span class="comment">[ef12f820]</span> <span class="comment">[c0275820]</span> nand_do_read_ops+0x130/0x3dc</div><div class="line"><span class="comment">[ef12f880]</span> <span class="comment">[c0275ebc]</span> nand_read+0xac/0xe0</div><div class="line"><span class="comment">[ef12f8b0]</span> <span class="comment">[c0262d98]</span> part_read+0x5c/0xe4</div><div class="line"><span class="comment">[ef12f8c0]</span> <span class="comment">[c017bcac]</span> jffs2_flash_read+0x68/0x254</div><div class="line"><span class="comment">[ef12f8f0]</span> <span class="comment">[c0170550]</span> jffs2_read_dnode+0x60/0x304</div><div class="line"><span class="comment">[ef12f940]</span> <span class="comment">[c017088c]</span> jffs2_read_inode_range+0x98/0x180</div><div class="line"><span class="comment">[ef12f970]</span> <span class="comment">[c016e610]</span> jffs2_do_readpage_nolock+0x94/0x1ac</div><div class="line"><span class="comment">[ef12f990]</span> <span class="comment">[c016ee04]</span> jffs2_write_begin+0x2b0/0x330</div><div class="line"><span class="comment">[ef12fa10]</span> <span class="comment">[c005144c]</span> generic_file_buffered_write+0x11c/0x8d0</div><div class="line"><span class="comment">[ef12fab0]</span> <span class="comment">[c0051e48]</span> __generic_file_aio_write_nolock+0x248/0x500</div><div class="line"><span class="comment">[ef12fb20]</span> <span class="comment">[c0052168]</span> generic_file_aio_write+0x68/0x10c</div><div class="line"><span class="comment">[ef12fb50]</span> <span class="comment">[c007ca80]</span> do_sync_write+0xc4/0x138</div><div class="line"><span class="comment">[ef12fc10]</span> <span class="comment">[f107c0dc]</span> oops_log+0xdc/0x1e8 <span class="comment">[oopslog]</span></div><div class="line"><span class="comment">[ef12fe70]</span> <span class="comment">[f3087058]</span> oops_log_init+0x58/0xa0 <span class="comment">[oopslog]</span></div><div class="line"><span class="comment">[ef12fe80]</span> <span class="comment">[c00477bc]</span> sys_init_module+0x130/0x17dc</div><div class="line"><span class="comment">[ef12ff40]</span> <span class="comment">[c00104b0]</span> ret_from_syscall+0x0/0x38</div><div class="line">--- Exception: c01 at 0xff29658</div><div class="line">    LR = 0x10031300</div></pre></td></tr></table></figure>
+<p>上面的log我们可以看到进程栈，以及栈帧（stack frame）调用关系。还可以看到此时各寄存器对应的值。（关于 stack和 stack frame以后会介绍）<br>我们可以对vmlinux进行反编译，获取堆栈地址对应的函数信息。gdb是我们常用的反编译工具，其他反编译如IDA也可以尝试。</p>
+<h3 id="相关工具及基本认识"><a href="#相关工具及基本认识" class="headerlink" title="相关工具及基本认识"></a>相关工具及基本认识</h3><blockquote>
+<p>SP（R13）堆栈指针， 指向异常模式所专用的堆栈</p>
+<p>LR（R14）连接寄存器</p>
+<ul>
+<li>用来存放子程序返回地址</li>
+<li>异常发生时保存异常返回地址（一般为PC减去0x04或0x02）</li>
+</ul>
+<p>PC（R15）存放当前指令地址<br>(此处后面会补充常用汇编命令和R1-R15寄存器意义)</p>
+</blockquote>
+<p>Android源码中自带gdb调试工具(不同的Android版本可能位置不同)：<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">prebuilts<span class="regexp">/gcc/</span>linux-x86<span class="regexp">/arm/</span>arm-linux-androideabi-<span class="number">4.9</span><span class="regexp">/bin/</span>arm-linux-androideabi-gdb</div></pre></td></tr></table></figure></p>
+<p>Android版本对应的vmlinux：<br><figure class="highlight awk"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">out<span class="regexp">/target/</span>product<span class="regexp">/xxx/</span>obj<span class="regexp">/KERNEL_OBJ/</span>vmlinux</div></pre></td></tr></table></figure></p>
+<h3 id="gdb-反编译常用命令"><a href="#gdb-反编译常用命令" class="headerlink" title="gdb 反编译常用命令"></a>gdb 反编译常用命令</h3><blockquote>
+<p>加载symbol文件</p>
+</blockquote>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">file</span> vmlinux</div></pre></td></tr></table></figure>
+<blockquote>
+<p>反编译函数形成汇编语言</p>
+</blockquote>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">disassemble (<span class="name">/m</span>) do_sync_write (<span class="name">/m</span>反编译成汇编与c混合)</div></pre></td></tr></table></figure>
+<blockquote>
+<p>利用加假断点可以查看对应代码位置与行号</p>
+</blockquote>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">d *(<span class="name">do_sync_write+0xc4</span>)</div></pre></td></tr></table></figure>
+<blockquote>
+<p>查看函数信息</p>
+</blockquote>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="builtin-name">info</span> line do_sync_write</div><div class="line"><span class="builtin-name">info</span> line <span class="number">*0</span>xff29658</div></pre></td></tr></table></figure>
+<p>我们可以利用反编译可以很轻松的查到对应的代码调用信息。根据反汇编函数可以看到对应寄存操作，在panic问题出现时一般会打印此时所有寄存器的值，我们可以在反汇编的基础上来推算运算值是否准确，从计算的结果可以方便的判断出计算值是否发生bitflip,也可以知道cpu的ALU计算单元错误，这和cpu的设计和稳定性相关。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+<blockquote class="blockquote-center">
+    <p>如果您觉得本博客还不错，欢迎继续关注本博客，欢迎多提宝贵意见，非常感谢！</p>
+</blockquote>
+<span id="inline-green" style="border-radius:3px;">作者</span>：
+<a class="link-blue" href="https://techgid.github.io" target="_blank">Jam</a>
+有问题请 <a class="link-blue" href="https://techgid.github.io/about/">留言</a>
+或者私信我的 <a class="link-blue" href="http://weibo.com/523927898" target="_blank">微博</a>。
+<div style="text-align:center; color:#ccc; font-size:14px; ">
+ ------本文结束
+ &nbsp;<i class="fa fa-paw"></i>&nbsp;
+ 感谢阅读------
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/wechat_pay.png" alt="Jam WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/ali_pay.png" alt="Jam Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+    <!--
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-kernel/" rel="tag"># Android kernel</a>
+          
+        </div>
+      
+      -->
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/04/Suzhou-Picture/" rel="next" title="苏州 印象">
+                <i class="fa fa-chevron-left"></i> 苏州 印象
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/23/android-mount/" rel="prev" title="android mount 简单分析">
+                android mount 简单分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ofywot861.bkt.clouddn.com/head.jpg"
+               alt="Jam" />
+          <p class="site-author-name" itemprop="name">Jam</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tag/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/techgid" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/jamgogo" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/jamhu" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#kernel-apanic介绍"><span class="nav-number">1.</span> <span class="nav-text">kernel apanic介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见的错误类型："><span class="nav-number">2.</span> <span class="nav-text">常见的错误类型：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关工具及基本认识"><span class="nav-number">3.</span> <span class="nav-text">相关工具及基本认识</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gdb-反编译常用命令"><span class="nav-number">4.</span> <span class="nav-text">gdb 反编译常用命令</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jam</span>
+</div>
+
+
+<div class="powered-by">
+  Power by GitPages
+</div>
+
+<div class="theme-info">
+   O(∩_∩)O~
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "852f2aeb652c410baaa3c8ad8b29f749",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 动态背景 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+<script type="text/javascript" src="/js/src/particle.js" count="50" zindex="-2" opacity="1" color="0,104,183"></script>
+<!-- 小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

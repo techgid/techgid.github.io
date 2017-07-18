@@ -1,0 +1,910 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android mount," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="概述在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。  参考源码： AndroidXref N">
+<meta name="keywords" content="Android mount">
+<meta property="og:type" content="article">
+<meta property="og:title" content="android mount 简单分析">
+<meta property="og:url" content="http://techgid.github.io/2017/04/23/android-mount/index.html">
+<meta property="og:site_name" content="Jam&#39;s Blog">
+<meta property="og:description" content="概述在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。  参考源码： AndroidXref N">
+<meta property="og:updated_time" content="2017-07-18T02:09:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="android mount 简单分析">
+<meta name="twitter:description" content="概述在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。  参考源码： AndroidXref N">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'O5OALVKRKP',
+      apiKey: '35552d6295827ae2d887789bbf951c04',
+      indexName: 'JamBolg',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://techgid.github.io/2017/04/23/android-mount/"/>
+
+
+
+
+
+  <title> android mount 简单分析 | Jam's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0491134d053ed5de216af5c4bc8c9acb";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jam's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">To Be A Lean Developer!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tag" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://techgid.github.io/2017/04/23/android-mount/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jam">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ofywot861.bkt.clouddn.com/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jam's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                android mount 简单分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-23T22:47:52+08:00">
+                2017-04-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/学习笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">学习笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2017/04/23/android-mount/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。</p>
+<blockquote>
+<p>参考源码： <a href="http://androidxref.com/7.1.1_r6/" target="_blank" rel="external">AndroidXref Nougat 7.1.1</a></p>
+</blockquote>
+<a id="more"></a>
+<hr>
+<h3 id="mount相关命令介绍"><a href="#mount相关命令介绍" class="headerlink" title="mount相关命令介绍"></a>mount相关命令介绍</h3><blockquote>
+<p>mount - 挂载文件系统</p>
+</blockquote>
+<p>此命令的标准格式是：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount -t<span class="built_in"> type </span>device dir</div></pre></td></tr></table></figure></p>
+<p>-t 文件系统类型 常用的有ext4 ufs vfat<br>device 设备节点<br>dir 挂载点</p>
+<ul>
+<li>原 dir 里面的 内容/属主/权限 将被屏蔽，直到此设备被卸载。</li>
+<li>如果只给出了 dir 或者只给出了 device ，那么将根据 /etc/fstab 的设置进行挂载。</li>
+<li>如果想避免 dir 与 device 之间的混淆，可以使用 –target(表示dir) 或 –source(表示device) 进行明确标明：</li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">mount <span class="params">--target</span> <span class="string">/mountpoint</span></div></pre></td></tr></table></figure>
+<p>常用flag<br>noatime<br>常用option<br>discard<br>此处以后慢慢补充相关介绍。</p>
+<p>在android系统终我们可以使用下面命令查看基本分区信息。<br><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">adb <span class="keyword">shell</span><span class="bash"> mount</span></div><div class="line">adb <span class="keyword">shell</span><span class="bash"> df -h</span></div></pre></td></tr></table></figure></p>
+<h3 id="mount流程"><a href="#mount流程" class="headerlink" title="mount流程"></a>mount流程</h3><p>Android系统中有很多分区，如”system” “data” “cache”分区等，通常在kernel起来后执行的第一个文件init进程中去挂载这些分区，init进程会根据init.rc的规则进行启动进程或相关服务。</p>
+<blockquote>
+<p>  /device/moto/shamu/init.shamu.rc</p>
+</blockquote>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="number">38</span><span class="keyword">on</span> fs</div><div class="line"><span class="symbol">39 </span>   mount_all fstab.shamu</div><div class="line"><span class="number">40</span></div><div class="line"><span class="symbol">41 </span>   # Keeping following partitions outside fstab file. As user may <span class="keyword">not</span> have</div><div class="line"><span class="symbol">42 </span>   # these partition flashed <span class="keyword">on</span> the device. Failure <span class="keyword">to</span> mount any partition in fstab file</div><div class="line"><span class="symbol">43 </span>   # results in failure <span class="keyword">to</span> launch late-start class.</div><div class="line"><span class="symbol">44 </span>   <span class="keyword">wait</span> /dev/block/platform/msm_sdcc.<span class="number">1</span>/by-<span class="keyword">name</span>/oem</div><div class="line"><span class="symbol">45 </span>   mount ext4 /dev/block/platform/msm_sdcc.<span class="number">1</span>/by-<span class="keyword">name</span>/oem /oem ro nosuid nodev context=u:object_r:oemfs:s0</div><div class="line"><span class="number">46</span></div><div class="line"><span class="symbol">47 </span>   <span class="keyword">mkdir</span> /fsg <span class="number">0755</span> root root</div><div class="line"><span class="symbol">48 </span>   mount ext4 /dev/block/platform/msm_sdcc.<span class="number">1</span>/by-<span class="keyword">name</span>/mdm1m9kefs3 /fsg ro nosuid nodev barrier=<span class="number">0</span> context=u:object_r:fsg_file:s0</div></pre></td></tr></table></figure>
+<p>在init.rc规则文件中我们看到挂载相关主要使用两个命令<strong>mount</strong>和<strong>mount_all</strong>，下面我们将分别分析这两个命令。</p>
+<blockquote>
+<p>system/core/init/builtins.c</p>
+</blockquote>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="symbol">1017 </span>       &#123;<span class="string">"mount_all"</span>,               &#123;<span class="number">1</span>,     kMax, do_mount_all&#125;&#125;,</div><div class="line"><span class="symbol">1018 </span>       &#123;<span class="string">"mount"</span>,                   &#123;<span class="number">3</span>,     kMax, do_mount&#125;&#125;,</div></pre></td></tr></table></figure>
+<p>我们可以看到mount对应的函数为do_mount，因此我们继续追踪do_mount函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="number">377</span><span class="comment">/* mount &lt;type&gt; &lt;device&gt; &lt;path&gt; &lt;flags ...&gt; &lt;options&gt; */</span></div><div class="line"><span class="number">378</span><span class="function"><span class="keyword">static</span> <span class="keyword">int</span> <span class="title">do_mount</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;&amp; args)</span> </span>&#123;</div><div class="line"><span class="number">379</span>    <span class="keyword">char</span> tmp[<span class="number">64</span>];</div><div class="line"><span class="number">380</span>    <span class="keyword">const</span> <span class="keyword">char</span> *source, *target, *system;</div><div class="line"><span class="number">381</span>    <span class="keyword">const</span> <span class="keyword">char</span> *options = <span class="literal">NULL</span>;</div><div class="line"><span class="number">382</span>    <span class="keyword">unsigned</span> flags = <span class="number">0</span>;</div><div class="line"><span class="number">383</span>    <span class="built_in">std</span>::<span class="keyword">size_t</span> na = <span class="number">0</span>;</div><div class="line"><span class="number">384</span>    <span class="keyword">int</span> n, i;</div><div class="line"><span class="number">385</span>    <span class="keyword">int</span> wait = <span class="number">0</span>;</div><div class="line"><span class="number">386</span></div><div class="line"><span class="number">387</span>    <span class="keyword">for</span> (na = <span class="number">4</span>; na &lt; args.size(); na++) &#123;</div><div class="line"><span class="number">388</span>        <span class="keyword">for</span> (i = <span class="number">0</span>; mount_flags[i].name; i++) &#123;</div><div class="line"><span class="number">389</span>            <span class="keyword">if</span> (!args[na].compare(mount_flags[i].name)) &#123;</div><div class="line"><span class="number">390</span>                flags |= mount_flags[i].flag;</div><div class="line"><span class="number">391</span>                <span class="keyword">break</span>;</div><div class="line"><span class="number">392</span>            &#125;</div><div class="line"><span class="number">393</span>        &#125;</div><div class="line"><span class="number">394</span></div><div class="line"><span class="number">395</span>        <span class="keyword">if</span> (!mount_flags[i].name) &#123;</div><div class="line"><span class="number">396</span>            <span class="keyword">if</span> (!args[na].compare(<span class="string">"wait"</span>))</div><div class="line"><span class="number">397</span>                wait = <span class="number">1</span>;</div><div class="line"><span class="number">398</span>            <span class="comment">/* if our last argument isn't a flag, wolf it up as an option string */</span></div><div class="line"><span class="number">399</span>            <span class="keyword">else</span> <span class="keyword">if</span> (na + <span class="number">1</span> == args.size())</div><div class="line"><span class="number">400</span>                options = args[na].c_str();</div><div class="line"><span class="number">401</span>        &#125;</div><div class="line"><span class="number">402</span>    &#125;</div><div class="line"><span class="number">403</span></div><div class="line"><span class="number">404</span>    system = args[<span class="number">1</span>].c_str();</div><div class="line"><span class="number">405</span>    source = args[<span class="number">2</span>].c_str();</div><div class="line"><span class="number">406</span>    target = args[<span class="number">3</span>].c_str();</div><div class="line">...</div><div class="line"><span class="number">418</span>        <span class="keyword">if</span> (mount(tmp, target, system, flags, options) &lt; <span class="number">0</span>) &#123;</div></pre></td></tr></table></figure>
+<p>do_mount函数比较简单，最后使用系统调用mount函数来挂载分区。至此mount命令结束，如果有特殊需求我们也可以在此函数上做简单修改。例如判断为对应版本的flash时追加discard属性：<br><figure class="highlight nix"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">diff --git a/init/<span class="built_in">builtins</span>.c b/init/<span class="built_in">builtins</span>.c</div><div class="line">index <span class="number">026115</span>a..<span class="number">5246</span>f32 <span class="number">100755</span></div><div class="line">--- a/init/<span class="built_in">builtins</span>.c</div><div class="line">+++ b/init/<span class="built_in">builtins</span>.c</div><div class="line">@@ -<span class="number">887</span>,<span class="number">6</span> +<span class="number">887</span>,<span class="number">15</span> @@ char  <span class="attr">emerg_flag</span> = <span class="number">0</span>;</div><div class="line">     <span class="attr">type</span> = args[<span class="number">1</span>];</div><div class="line">     <span class="attr">source</span> = args[<span class="number">2</span>];</div><div class="line">     <span class="attr">target</span> = args[<span class="number">3</span>];</div><div class="line">+</div><div class="line">+    <span class="keyword">if</span> (! strcmp(target, <span class="string">"/data"</span>)) &#123;</div><div class="line">+        <span class="keyword">if</span> (! fs_mgr_is_hynic_emmc50()) &#123;</div><div class="line">+            <span class="attr">options</span> = <span class="string">"discard"</span>;</div><div class="line">+	       &#125;</div><div class="line">+    &#125;</div><div class="line">+</div><div class="line"> <span class="comment">#if 0</span></div><div class="line">    <span class="keyword">if</span> (!strcmp(target, DATA_MNT_POINT)&amp;&amp;!strcmp(source,DATA_PATH) )</div></pre></td></tr></table></figure></p>
+<p>而mount_all命令对应do_mount_all函数。<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="number">596</span>/* mount_all &lt;fstab&gt; [ &lt;path&gt; ]* [--&lt;options&gt;]*</div><div class="line"><span class="symbol">597 </span>*</div><div class="line"><span class="symbol">598 </span>* This function might request a reboot, in which case it will</div><div class="line"><span class="symbol">599 </span>* <span class="keyword">not</span> <span class="keyword">return</span>.</div><div class="line"><span class="symbol">600 </span>*/</div><div class="line"><span class="number">601</span>static <span class="keyword">int</span> do_mount_all(const std::vector&lt;std::string&gt;&amp; args) &#123;</div><div class="line"><span class="symbol">602 </span>   std::size_t na = <span class="number">0</span>;</div><div class="line"><span class="symbol">603 </span>   bool import_rc = true;</div><div class="line"><span class="symbol">604 </span>   bool queue_event = true;</div><div class="line"><span class="symbol">605 </span>   <span class="keyword">int</span> mount_mode = MOUNT_MODE_DEFAULT;</div><div class="line"><span class="symbol">606 </span>   const char* fstabfile = args[<span class="number">1</span>].c_str();</div><div class="line"><span class="symbol">607 </span>   std::size_t path_arg_end = args.size();</div><div class="line"><span class="number">608</span></div><div class="line"><span class="symbol">609 </span>   <span class="keyword">for</span> (na = args.size() - <span class="number">1</span>; na &gt; <span class="number">1</span>; --na) &#123;</div><div class="line"><span class="symbol">610 </span>       <span class="keyword">if</span> (args[na] == <span class="string">"--early"</span>) &#123;</div><div class="line"><span class="symbol">611 </span>            path_arg_end = na;</div><div class="line"><span class="symbol">612 </span>            queue_event = false;</div><div class="line"><span class="symbol">613 </span>            mount_mode = MOUNT_MODE_EARLY;</div><div class="line"><span class="symbol">614 </span>       &#125; <span class="keyword">else</span> <span class="keyword">if</span> (args[na] == <span class="string">"--late"</span>) &#123;</div><div class="line"><span class="symbol">615 </span>           path_arg_end = na;</div><div class="line"><span class="symbol">616 </span>           import_rc = false;</div><div class="line"><span class="symbol">617 </span>           mount_mode = MOUNT_MODE_LATE;</div><div class="line"><span class="symbol">618 </span>       &#125;</div><div class="line"><span class="symbol">619 </span>   &#125;</div><div class="line"><span class="number">620</span></div><div class="line"><span class="symbol">621 </span>   <span class="keyword">int</span> ret =  mount_fstab(fstabfile, mount_mode);</div><div class="line"><span class="number">622</span></div><div class="line"><span class="symbol">623 </span>   <span class="keyword">if</span> (import_rc) &#123;</div><div class="line"><span class="symbol">624 </span>       /* Paths of .rc <span class="keyword">files</span> are specified at the <span class="number">2</span>nd argument <span class="keyword">and</span> beyond */</div><div class="line"><span class="symbol">625 </span>       import_late(args, <span class="number">2</span>, path_arg_end);</div><div class="line"><span class="symbol">626 </span>   &#125;</div><div class="line"><span class="number">627</span></div><div class="line"><span class="symbol">628 </span>   <span class="keyword">if</span> (queue_event) &#123;</div><div class="line"><span class="symbol">629 </span>       /* queue_fs_event will queue event based <span class="keyword">on</span> mount_fstab <span class="keyword">return</span> code</div><div class="line"><span class="symbol">630 </span>        * <span class="keyword">and</span> <span class="keyword">return</span> processed <span class="keyword">return</span> code*/</div><div class="line"><span class="symbol">631 </span>       ret = queue_fs_event(ret);</div><div class="line"><span class="symbol">632 </span>   &#125;</div><div class="line"><span class="number">633</span></div><div class="line"><span class="symbol">634 </span>   <span class="keyword">return</span> ret;</div><div class="line"><span class="number">635</span>&#125;</div></pre></td></tr></table></figure></p>
+<p>do_mount_all函数传入的参数为fstab.shamu文件系统挂载表路径。该函数首先对参数进行了预处理。然后调用mount_fastab函数，进行mount操作。首先我们看下fstab。</p>
+<blockquote>
+<p>/device/moto/shamu/fstab.shamu</p>
+</blockquote>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span><span class="meta"># Android fstab file.</span></div><div class="line"><span class="number">2</span><span class="meta"># The filesystem that contains the filesystem checker binary (typically /system) cannot</span></div><div class="line"><span class="number">3</span><span class="meta"># specify MF_CHECK, and must come before any filesystems that do specify MF_CHECK</span></div><div class="line"><span class="number">4</span><span class="meta">#</span></div><div class="line"><span class="number">5</span><span class="meta">#&lt;src&gt;                                                &lt;mnt_point&gt;  &lt;type&gt;  &lt;mnt_flags and options&gt;                     &lt;fs_mgr_flags&gt;</span></div><div class="line"><span class="number">6</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>system         /system      ext4    ro,barrier=<span class="number">1</span>                                wait,verify=<span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>metadata</div><div class="line"><span class="number">7</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>userdata    /data        ext4    rw,nosuid,nodev,noatime,nodiratime,noauto_da_alloc,nobarrier    wait,check,formattable,forceencrypt=<span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>metadata</div><div class="line"><span class="number">8</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>cache       /cache       ext4    rw,noatime,nosuid,nodev,barrier=<span class="number">1</span>,data=ordered   wait,check,formattable</div><div class="line"><span class="number">9</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>modem       /firmware    ext4    ro,barrier=<span class="number">1</span>,context=u:object_r:firmware_file:s0    wait</div><div class="line"><span class="number">10</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>persist     /persist     ext4    rw,nosuid,nodev,barrier=<span class="number">1</span>                      wait,check,notrim</div><div class="line"><span class="number">11</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>boot         /boot           emmc    defaults                                                        defaults</div><div class="line"><span class="number">12</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>recovery     /recovery       emmc    defaults                                                        defaults</div><div class="line"><span class="number">13</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>misc         /misc           emmc    defaults                                                        defaults</div><div class="line"><span class="number">14</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>modem        /modem          emmc    defaults                                                        defaults</div><div class="line"><span class="number">15</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>mdm1m9kefs1  /mdm1m9kefs1    emmc    defaults                                                        defaults</div><div class="line"><span class="number">16</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>mdm1m9kefs2  /mdm1m9kefs2    emmc    defaults                                                        defaults</div><div class="line"><span class="number">17</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>mdm1m9kefs3  /mdm1m9kefs3    emmc    defaults                                                        defaults</div><div class="line"><span class="number">18</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>sbl1         /sbl1           emmc    defaults                                                        defaults</div><div class="line"><span class="number">19</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>tz           /tz             emmc    defaults                                                        defaults</div><div class="line"><span class="number">20</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>rpm          /rpm            emmc    defaults                                                        defaults</div><div class="line"><span class="number">21</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>sdi          /sdi            emmc    defaults                                                        defaults</div><div class="line"><span class="number">22</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>aboot        /aboot          emmc    defaults                                                        defaults</div><div class="line"><span class="number">23</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>versions     /versions       emmc    defaults                                                        defaults</div><div class="line"><span class="number">24</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>logo         /logo           emmc    defaults                                                        defaults</div><div class="line"><span class="number">25</span><span class="meta-keyword">/dev/</span>block<span class="meta-keyword">/platform/</span>msm_sdcc<span class="number">.1</span><span class="meta-keyword">/by-name/</span>frp          /persistent     emmc    defaults                                                        defaults</div><div class="line"><span class="number">26</span><span class="meta-keyword">/devices/</span>*/xhci-hcd<span class="number">.0</span>.auto/usb*                     auto            auto    defaults                                                        voldmanaged=usb:auto</div></pre></td></tr></table></figure>
+<p>每行对应的是设备节点，挂载点，flag以及options，我们继续追踪mount_fstab函数。<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div></pre></td><td class="code"><pre><div class="line"><span class="number">502</span>/* mount_fstab</div><div class="line"><span class="symbol">503 </span>*</div><div class="line"><span class="symbol">504 </span>*  <span class="keyword">Call</span> fs_mgr_mount_all() <span class="keyword">to</span> mount the given fstab</div><div class="line"><span class="symbol">505 </span>*/</div><div class="line"><span class="number">506</span>static <span class="keyword">int</span> mount_fstab(const char* fstabfile, <span class="keyword">int</span> mount_mode) &#123;</div><div class="line"><span class="symbol">507 </span>   pid_t pid;</div><div class="line"><span class="symbol">508 </span>   <span class="keyword">int</span> ret = -<span class="number">1</span>;</div><div class="line"><span class="symbol">509 </span>   <span class="keyword">int</span> child_ret = -<span class="number">1</span>;</div><div class="line"><span class="symbol">510 </span>   <span class="keyword">int</span> status;</div><div class="line"><span class="symbol">511 </span>   struct fstab *fstab;</div><div class="line"><span class="number">512</span></div><div class="line"><span class="symbol">513 </span>   /*</div><div class="line"><span class="symbol">514 </span>    * <span class="keyword">Call</span> fs_mgr_mount_all() <span class="keyword">to</span> mount all filesystems.  We fork(<span class="number">2</span>) <span class="keyword">and</span></div><div class="line"><span class="symbol">515 </span>    * do the <span class="keyword">call</span> in the child <span class="keyword">to</span> provide protection <span class="keyword">to</span> the main init</div><div class="line"><span class="symbol">516 </span>    * process <span class="keyword">if</span> anything goes wrong (crash <span class="keyword">or</span> memory leak), <span class="keyword">and</span> <span class="keyword">wait</span> <span class="keyword">for</span></div><div class="line"><span class="symbol">517 </span>    * the child <span class="keyword">to</span> finish in the parent.</div><div class="line"><span class="symbol">518 </span>    */</div><div class="line"><span class="symbol">519 </span>   pid = fork();</div><div class="line"><span class="symbol">520 </span>   <span class="keyword">if</span> (pid &gt; <span class="number">0</span>) &#123;</div><div class="line"><span class="symbol">521 </span>       /* Parent.  <span class="keyword">Wait</span> <span class="keyword">for</span> the child <span class="keyword">to</span> <span class="keyword">return</span> */</div><div class="line"><span class="symbol">522 </span>       <span class="keyword">int</span> wp_ret = TEMP_FAILURE_RETRY(waitpid(pid, &amp;status, <span class="number">0</span>));</div><div class="line"><span class="symbol">523 </span>       <span class="keyword">if</span> (wp_ret &lt; <span class="number">0</span>) &#123;</div><div class="line"><span class="symbol">524 </span>           /* Unexpected <span class="keyword">error</span> code. We will continue anyway. */</div><div class="line"><span class="symbol">525 </span>           NOTICE(<span class="string">"waitpid failed rc=%d: %s\n"</span>, wp_ret, strerror(errno));</div><div class="line"><span class="symbol">526 </span>       &#125;</div><div class="line"><span class="number">527</span></div><div class="line"><span class="symbol">528 </span>       <span class="keyword">if</span> (WIFEXITED(status)) &#123;</div><div class="line"><span class="symbol">529 </span>           ret = WEXITSTATUS(status);</div><div class="line"><span class="symbol">530 </span>       &#125; <span class="keyword">else</span> &#123;</div><div class="line"><span class="symbol">531 </span>           ret = -<span class="number">1</span>;</div><div class="line"><span class="symbol">532 </span>       &#125;</div><div class="line"><span class="symbol">533 </span>   &#125; <span class="keyword">else</span> <span class="keyword">if</span> (pid == <span class="number">0</span>) &#123;</div><div class="line"><span class="symbol">534 </span>       /* child, <span class="keyword">call</span> fs_mgr_mount_all() */</div><div class="line"><span class="symbol">535 </span>       klog_set_level(<span class="number">6</span>);  /* So we can see what fs_mgr_mount_all() does */</div><div class="line"><span class="symbol">536 </span>       fstab = fs_mgr_read_fstab(fstabfile);</div><div class="line"><span class="symbol">537 </span>       child_ret = fs_mgr_mount_all(fstab, mount_mode);</div><div class="line"><span class="symbol">538 </span>       fs_mgr_free_fstab(fstab);</div><div class="line"><span class="symbol">539 </span>       <span class="keyword">if</span> (child_ret == -<span class="number">1</span>) &#123;</div><div class="line"><span class="symbol">540 </span>           <span class="keyword">ERROR</span>(<span class="string">"fs_mgr_mount_all returned an error\n"</span>);</div><div class="line"><span class="symbol">541 </span>       &#125;</div><div class="line"><span class="symbol">542 </span>       _exit(child_ret);</div><div class="line"><span class="symbol">543 </span>   &#125; <span class="keyword">else</span> &#123;</div><div class="line"><span class="symbol">544 </span>       /* fork failed, <span class="keyword">return</span> an <span class="keyword">error</span> */</div><div class="line"><span class="symbol">545 </span>       <span class="keyword">return</span> -<span class="number">1</span>;</div><div class="line"><span class="symbol">546 </span>   &#125;</div><div class="line"><span class="symbol">547 </span>   <span class="keyword">return</span> ret;</div><div class="line"><span class="number">548</span>&#125;</div></pre></td></tr></table></figure></p>
+<p>该函数中主要调用两个函数，首先读取fstab挂载表，然后挂载。<br><figure class="highlight basic"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="symbol">536 </span>       fstab = fs_mgr_read_fstab(fstabfile);</div><div class="line"><span class="symbol">537 </span>       child_ret = fs_mgr_mount_all(fstab, mount_mode);</div></pre></td></tr></table></figure></p>
+<p>我们继续看这两个函数</p>
+<blockquote>
+<p>/system/core/fs_mgr/fs_mgr_fstab.c</p>
+</blockquote>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div></pre></td><td class="code"><pre><div class="line"><span class="number">245</span>struct fstab *fs_mgr_read_fstab(const char *fstab_path)</div><div class="line"><span class="number">246</span>&#123;</div><div class="line"><span class="number">247</span>    FILE *fstab_file;</div><div class="line"><span class="number">248</span>    int cnt, entries;</div><div class="line"><span class="number">249</span>    ssize_t len;</div><div class="line"><span class="number">250</span>    size_t alloc_len = <span class="number">0</span>;</div><div class="line"><span class="number">251</span>    char *line = NULL;</div><div class="line"><span class="number">252</span>    const char *delim = <span class="string">" <span class="subst">\t</span>"</span>;</div><div class="line"><span class="number">253</span>    char *save_ptr, *p;</div><div class="line"><span class="number">254</span>    struct fstab *fstab = NULL;</div><div class="line"><span class="number">255</span>    struct fs_mgr_flag_values flag_vals;</div><div class="line"><span class="number">256</span>#define FS_OPTIONS_LEN <span class="number">1024</span></div><div class="line"><span class="number">257</span>    char tmp_fs_options[FS_OPTIONS_LEN];</div><div class="line"><span class="number">258</span></div><div class="line"><span class="number">259</span>    fstab_file = fopen(fstab_path, <span class="string">"r"</span>);</div><div class="line"><span class="number">260</span>    if (!fstab_file) &#123;</div><div class="line"><span class="number">261</span>        ERROR(<span class="string">"Cannot open file %s<span class="subst">\n</span>"</span>, fstab_path);</div><div class="line"><span class="number">262</span>        return <span class="number">0</span>;</div><div class="line"><span class="number">263</span>    &#125;</div><div class="line"><span class="number">264</span></div><div class="line"><span class="number">265</span>    entries = <span class="number">0</span>;</div><div class="line"><span class="number">266</span>    while ((len = getline(&amp;line, &amp;alloc_len, fstab_file)) != <span class="number">-1</span>) &#123;</div><div class="line"><span class="number">267</span>        <span class="comment">/* if the last character is a newline, shorten the string by 1 byte */</span></div><div class="line"><span class="number">268</span>        if (line[len - <span class="number">1</span>] == '\n') &#123;</div><div class="line"><span class="number">269</span>            line[len - <span class="number">1</span>] = '\<span class="number">0</span>';</div><div class="line"><span class="number">270</span>        &#125;</div><div class="line"><span class="number">271</span>        <span class="comment">/* Skip any leading whitespace */</span></div><div class="line"><span class="number">272</span>        p = line;</div><div class="line"><span class="number">273</span>        while (isspace(*p)) &#123;</div><div class="line"><span class="number">274</span>            p++;</div><div class="line"><span class="number">275</span>        &#125;</div><div class="line"><span class="number">276</span>        <span class="comment">/* ignore comments or empty lines */</span></div><div class="line"><span class="number">277</span>        if (*p == '#' || *p == '\<span class="number">0</span>')</div><div class="line"><span class="number">278</span>            continue;</div><div class="line"><span class="number">279</span>        entries++;</div><div class="line"><span class="number">280</span>    &#125;</div><div class="line"><span class="number">281</span></div><div class="line"><span class="number">282</span>    if (!entries) &#123;</div><div class="line"><span class="number">283</span>        ERROR(<span class="string">"No entries found in fstab<span class="subst">\n</span>"</span>);</div><div class="line"><span class="number">284</span>        goto err;</div><div class="line"><span class="number">285</span>    &#125;</div><div class="line"><span class="number">286</span></div><div class="line"><span class="number">287</span>    <span class="comment">/* Allocate and init the fstab structure */</span></div><div class="line"><span class="number">288</span>    fstab = calloc(<span class="number">1</span>, sizeof(struct fstab));</div><div class="line"><span class="number">289</span>    fstab-&gt;num_entries = entries;</div><div class="line"><span class="number">290</span>    fstab-&gt;fstab_filename = strdup(fstab_path);</div><div class="line"><span class="number">291</span>    fstab-&gt;recs = calloc(fstab-&gt;num_entries, sizeof(struct fstab_rec));</div><div class="line"><span class="number">292</span></div><div class="line"><span class="number">293</span>    fseek(fstab_file, <span class="number">0</span>, SEEK_SET);</div><div class="line"><span class="number">294</span></div><div class="line"><span class="number">295</span>    cnt = <span class="number">0</span>;</div><div class="line"><span class="number">296</span>    while ((len = getline(&amp;line, &amp;alloc_len, fstab_file)) != <span class="number">-1</span>) &#123;</div><div class="line"><span class="number">297</span>        <span class="comment">/* if the last character is a newline, shorten the string by 1 byte */</span></div><div class="line"><span class="number">298</span>        if (line[len - <span class="number">1</span>] == '\n') &#123;</div><div class="line"><span class="number">299</span>            line[len - <span class="number">1</span>] = '\<span class="number">0</span>';</div><div class="line"><span class="number">300</span>        &#125;</div><div class="line"><span class="number">301</span></div><div class="line"><span class="number">302</span>        <span class="comment">/* Skip any leading whitespace */</span></div><div class="line"><span class="number">303</span>        p = line;</div><div class="line"><span class="number">304</span>        while (isspace(*p)) &#123;</div><div class="line"><span class="number">305</span>            p++;</div><div class="line"><span class="number">306</span>        &#125;</div><div class="line"><span class="number">307</span>        <span class="comment">/* ignore comments or empty lines */</span></div><div class="line"><span class="number">308</span>        if (*p == '#' || *p == '\<span class="number">0</span>')</div><div class="line"><span class="number">309</span>            continue;</div><div class="line">...</div></pre></td></tr></table></figure>
+<p>可以看函数到按行读取fstab，返回fstab结构体实例.因此如果有特殊需求我们可以在读取文件系统表时做文章。下面就是fs_mgr_mount_all函数。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div></pre></td><td class="code"><pre><div class="line"><span class="number">487</span><span class="comment">/* When multiple fstab records share the same mount_point, it will</span></div><div class="line">488 * try to mount each one in turn, and ignore any duplicates after a</div><div class="line">489 * first successful mount.</div><div class="line">490 * Returns -1 on error, and  FS_MGR_MNTALL_* otherwise.</div><div class="line">491 */</div><div class="line"><span class="number">492</span>int fs_mgr_mount_all(struct fstab *fstab, int mount_mode)</div><div class="line"><span class="number">493</span>&#123;</div><div class="line"><span class="number">494</span>    int i = <span class="number">0</span>;</div><div class="line"><span class="number">495</span>    int encryptable = FS_MGR_MNTALL_DEV_NOT_ENCRYPTABLE;</div><div class="line"><span class="number">496</span>    int error_count = <span class="number">0</span>;</div><div class="line"><span class="number">497</span>    int mret = <span class="number">-1</span>;</div><div class="line"><span class="number">498</span>    int mount_errno = <span class="number">0</span>;</div><div class="line"><span class="number">499</span>    int attempted_idx = <span class="number">-1</span>;</div><div class="line"><span class="number">500</span></div><div class="line"><span class="number">501</span>    if (!fstab) &#123;</div><div class="line"><span class="number">502</span>        return <span class="number">-1</span>;</div><div class="line"><span class="number">503</span>    &#125;</div><div class="line"><span class="number">504</span></div><div class="line"><span class="number">505</span>    for (i = <span class="number">0</span>; i &lt; fstab-&gt;num_entries; i++) &#123;</div><div class="line"><span class="number">506</span>        <span class="comment">/* Don't mount entries that are managed by vold or not for the mount mode*/</span></div><div class="line"><span class="number">507</span>        if ((fstab-&gt;recs[i].fs_mgr_flags &amp; (MF_VOLDMANAGED | MF_RECOVERYONLY)) ||</div><div class="line"><span class="number">508</span>             ((mount_mode == MOUNT_MODE_LATE) &amp;&amp; !fs_mgr_is_latemount(&amp;fstab-&gt;recs[i])) ||</div><div class="line"><span class="number">509</span>             ((mount_mode == MOUNT_MODE_EARLY) &amp;&amp; fs_mgr_is_latemount(&amp;fstab-&gt;recs[i]))) &#123;</div><div class="line"><span class="number">510</span>            continue;</div><div class="line"><span class="number">511</span>        &#125;</div><div class="line"><span class="number">512</span></div><div class="line">...</div><div class="line"><span class="number">603</span>            if (fs_mgr_do_format(&amp;fstab-&gt;recs[top_idx]) == <span class="number">0</span>) &#123;</div><div class="line"><span class="number">604</span>                <span class="comment">/* Let's replay the mount actions. */</span></div><div class="line"><span class="number">605</span>                i = top_idx - <span class="number">1</span>;</div><div class="line"><span class="number">606</span>                continue;</div><div class="line"><span class="number">607</span>            &#125; else &#123;</div><div class="line"><span class="number">608</span>                ERROR(<span class="string">"%s(): Format failed. Suggest recovery...<span class="subst">\n</span>"</span>, __func__);</div><div class="line"><span class="number">609</span>                encryptable = FS_MGR_MNTALL_DEV_NEEDS_RECOVERY;</div><div class="line"><span class="number">610</span>                continue;</div><div class="line"><span class="number">611</span>            &#125;</div><div class="line"><span class="number">612</span>        &#125;</div><div class="line"><span class="number">613</span>        if (mret &amp;&amp; mount_errno != EBUSY &amp;&amp; mount_errno != EACCES &amp;&amp;</div><div class="line">...</div><div class="line"><span class="number">634</span>        &#125; else &#123;</div><div class="line"><span class="number">635</span>            if (fs_mgr_is_nofail(&amp;fstab-&gt;recs[attempted_idx])) &#123;</div><div class="line"><span class="number">636</span>                ERROR(<span class="string">"Ignoring failure to mount an un-encryptable or wiped partition on"</span></div><div class="line"><span class="number">637</span>                       <span class="string">"%s at %s options: %s error: %s<span class="subst">\n</span>"</span>,</div><div class="line"><span class="number">638</span>                       fstab-&gt;recs[attempted_idx].blk_device, fstab-&gt;recs[attempted_idx].mount_point,</div><div class="line"><span class="number">639</span>                       fstab-&gt;recs[attempted_idx].fs_options, strerror(mount_errno));</div><div class="line"><span class="number">640</span>            &#125; else &#123;</div><div class="line"><span class="number">641</span>                ERROR(<span class="string">"Failed to mount an un-encryptable or wiped partition on"</span></div><div class="line"><span class="number">642</span>                       <span class="string">"%s at %s options: %s error: %s<span class="subst">\n</span>"</span>,</div><div class="line"><span class="number">643</span>                       fstab-&gt;recs[attempted_idx].blk_device, fstab-&gt;recs[attempted_idx].mount_point,</div><div class="line"><span class="number">644</span>                       fstab-&gt;recs[attempted_idx].fs_options, strerror(mount_errno));</div><div class="line"><span class="number">645</span>                ++error_count;</div><div class="line"><span class="number">646</span>            &#125;</div><div class="line"><span class="number">647</span>            continue;</div><div class="line"><span class="number">648</span>        &#125;</div><div class="line"><span class="number">649</span>    &#125;</div><div class="line">...</div><div class="line"><span class="number">656</span>&#125;</div></pre></td></tr></table></figure></p>
+<p>进一步调用fs_mgr_do_mount函数。然后走到__mount函数，最终任然使用系统调用mount函数：<br><figure class="highlight haskell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="title">ret</span> = mount(source, target, <span class="keyword">rec</span>-&gt;fs_type, mountflags, <span class="keyword">rec</span>-&gt;fs_options);</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+<blockquote class="blockquote-center">
+    <p>如果您觉得本博客还不错，欢迎继续关注本博客，欢迎多提宝贵意见，非常感谢！</p>
+</blockquote>
+<span id="inline-green" style="border-radius:3px;">作者</span>：
+<a class="link-blue" href="https://techgid.github.io" target="_blank">Jam</a>
+有问题请 <a class="link-blue" href="https://techgid.github.io/about/">留言</a>
+或者私信我的 <a class="link-blue" href="http://weibo.com/523927898" target="_blank">微博</a>。
+<div style="text-align:center; color:#ccc; font-size:14px; ">
+ ------本文结束
+ &nbsp;<i class="fa fa-paw"></i>&nbsp;
+ 感谢阅读------
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/wechat_pay.png" alt="Jam WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/ali_pay.png" alt="Jam Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+    <!--
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-mount/" rel="tag"># Android mount</a>
+          
+        </div>
+      
+      -->
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/04/06/Kernel-apanic/" rel="next" title="Kernel apanic（KE） 分析方法">
+                <i class="fa fa-chevron-left"></i> Kernel apanic（KE） 分析方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/18/OpenGrok-install-note/" rel="prev" title="Ubuntu 中配置 OpenGrok 服务">
+                Ubuntu 中配置 OpenGrok 服务 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ofywot861.bkt.clouddn.com/head.jpg"
+               alt="Jam" />
+          <p class="site-author-name" itemprop="name">Jam</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tag/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/techgid" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/jamgogo" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/jamhu" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mount相关命令介绍"><span class="nav-number">2.</span> <span class="nav-text">mount相关命令介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mount流程"><span class="nav-number">3.</span> <span class="nav-text">mount流程</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jam</span>
+</div>
+
+
+<div class="powered-by">
+  Power by GitPages
+</div>
+
+<div class="theme-info">
+   O(∩_∩)O~
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "852f2aeb652c410baaa3c8ad8b29f749",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 动态背景 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+<script type="text/javascript" src="/js/src/particle.js" count="50" zindex="-2" opacity="1" color="0,104,183"></script>
+<!-- 小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>

@@ -1,0 +1,886 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="工作笔记,学习笔记," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="This is work note and will be update anytime.">
+<meta name="keywords" content="工作笔记,学习笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Work Note">
+<meta property="og:url" content="http://techgid.github.io/2016/11/22/Work-Note/index.html">
+<meta property="og:site_name" content="Jam&#39;s Blog">
+<meta property="og:description" content="This is work note and will be update anytime.">
+<meta property="og:updated_time" content="2017-07-18T02:09:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Work Note">
+<meta name="twitter:description" content="This is work note and will be update anytime.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'O5OALVKRKP',
+      apiKey: '35552d6295827ae2d887789bbf951c04',
+      indexName: 'JamBolg',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://techgid.github.io/2016/11/22/Work-Note/"/>
+
+
+
+
+
+  <title> Work Note | Jam's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?0491134d053ed5de216af5c4bc8c9acb";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jam's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">To Be A Lean Developer!</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tag" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <div class="algolia-popup popup search-popup">
+    <div class="algolia-search">
+      <div class="algolia-search-input-icon">
+        <i class="fa fa-search"></i>
+      </div>
+      <div class="algolia-search-input" id="algolia-search-input"></div>
+    </div>
+
+    <div class="algolia-results">
+      <div id="algolia-stats"></div>
+      <div id="algolia-hits"></div>
+      <div id="algolia-pagination" class="algolia-pagination"></div>
+    </div>
+
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+  </div>
+
+
+
+
+    </div>
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://techgid.github.io/2016/11/22/Work-Note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jam">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="http://ofywot861.bkt.clouddn.com/head.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jam's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Work Note
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2016-11-22T18:34:39+08:00">
+                2016-11-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/工作笔记/" itemprop="url" rel="index">
+                    <span itemprop="name">工作笔记</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a class="cloud-tie-join-count" href="/2016/11/22/Work-Note/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count join-count" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>This is work note and will be update anytime.</p>
+</blockquote>
+<a id="more"></a>
+<h3 id="Timer-Task-hanlder-案例应用"><a href="#Timer-Task-hanlder-案例应用" class="headerlink" title="Timer Task hanlder 案例应用"></a>Timer Task hanlder 案例应用</h3><blockquote>
+<p>使用timerTask制定定时任务</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//TimerTas 类</span></div><div class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">LongPressTask</span> <span class="keyword">extends</span> <span class="title">TimerTask</span> </span>&#123;</div><div class="line">    <span class="keyword">int</span> mSelection;</div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LongPressTask</span><span class="params">(<span class="keyword">int</span> selection)</span> </span>&#123;</div><div class="line">        mSelection = selection;</div><div class="line">    &#125;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">        longClicked = <span class="keyword">true</span>;</div><div class="line">        Message msg = <span class="keyword">new</span> Message();</div><div class="line">        msg.what = mSelection;</div><div class="line">        mTempHanlder.sendMessage(msg);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"><span class="comment">//初始化</span></div><div class="line"><span class="keyword">private</span> LongPressTask lpTask;</div><div class="line"><span class="keyword">private</span> Timer lpTimer;</div><div class="line"><span class="keyword">private</span> Handler mTempHanlder = <span class="keyword">new</span> Handler() &#123;</div><div class="line">    <span class="meta">@Override</span></div><div class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleMessage</span><span class="params">(Message msg)</span> </span>&#123;</div><div class="line">        <span class="keyword">if</span>(msg.what == FASTFORWARD)</div><div class="line">          ;</div><div class="line">        <span class="keyword">else</span> <span class="keyword">if</span>(msg.what == REVERSE)</div><div class="line">          ;  </div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"><span class="comment">//启用task</span></div><div class="line">lpTask = <span class="keyword">new</span> LongPressTask(FASTFORWARD);</div><div class="line">lpTimer =<span class="keyword">new</span> Timer();</div><div class="line">lpTimer.schedule(lpTask,<span class="number">300</span>,<span class="number">500</span>);</div><div class="line"><span class="comment">//停用Task</span></div><div class="line">lpTimer.cancel();</div></pre></td></tr></table></figure>
+<h3 id="Android窗口打开动画"><a href="#Android窗口打开动画" class="headerlink" title="Android窗口打开动画"></a>Android窗口打开动画</h3><blockquote>
+<p>控制进入界面的动画</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Theme中应用 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:windowAnimationStyle"</span>&gt;</span>@style/music_windowAnimationStyle<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- sytle --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">style</span> <span class="attr">name</span>=<span class="string">"music_windowAnimationStyle"</span> <span class="attr">parent</span>=<span class="string">"android:style/Animation.Translucent"</span>&gt;</span><span class="xml"></span></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:windowEnterAnimation"</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:windowExitAnimation"</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:activityOpenEnterAnimation"</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">item</span> <span class="attr">name</span>=<span class="string">"android:activityOpenExitAnimation"</span>&gt;</span>@null<span class="tag">&lt;/<span class="name">item</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div></pre></td></tr></table></figure>
+<h3 id="根据当前文件获取当前目录"><a href="#根据当前文件获取当前目录" class="headerlink" title="根据当前文件获取当前目录"></a>根据当前文件获取当前目录</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">String[] filePath = mFileUri.toString().split(<span class="string">"/"</span>);</div><div class="line">String fileDirectoryString = <span class="string">""</span>;</div><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; filePath.length - <span class="number">1</span>; i ++) &#123;</div><div class="line">    fileDirectoryString += filePath[i] + <span class="string">"/"</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="查询当前目录下的所有视频不包括子目录"><a href="#查询当前目录下的所有视频不包括子目录" class="headerlink" title="查询当前目录下的所有视频不包括子目录"></a>查询当前目录下的所有视频不包括子目录</h3><blockquote>
+<p>query();  @arg1 uri, @arg2 要查的列，@arg3 where 语句，@arg4 where语句参数，@arg5排序。<br>sqlit3语句不太会用，应该有更好的方法</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">getFilePathVideoList</span><span class="params">(String filePath)</span> </span>&#123;</div><div class="line">    String[] cols = <span class="keyword">new</span> String[] &#123;MediaStore.Audio.Media._ID, MediaStore.Video.Media.TITLE,</div><div class="line">            MediaStore.Video.Media.MIME_TYPE, MediaStore.Video.Media.DATE_TAKEN, MediaStore.Video.Media.DATA&#125;;</div><div class="line">    String where = MediaStore.Video.Media.DATA +<span class="string">" like '%"</span> + filePath  + <span class="string">"%'"</span>;</div><div class="line">    ContentResolver resolver = getContentResolver();</div><div class="line">    <span class="keyword">if</span> (resolver == <span class="keyword">null</span>) &#123;</div><div class="line">        Log.d(TAG, <span class="string">"getFilePathVideoList: resolver is null"</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        Cursor cursor = <span class="keyword">null</span>;</div><div class="line">        <span class="keyword">try</span> &#123;</div><div class="line">            cursor = resolver.query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cols,</div><div class="line">                    where, <span class="keyword">null</span>, <span class="keyword">null</span>);<span class="comment">//查询当前目录下所有的视频</span></div><div class="line">            <span class="keyword">if</span> (cursor != <span class="keyword">null</span> &amp;&amp; cursor.moveToFirst()) &#123;</div><div class="line">                <span class="keyword">do</span> &#123;</div><div class="line">                    String[] pathArray= cursor.getString(<span class="number">4</span>).split(filePath);</div><div class="line">                    <span class="keyword">if</span> (!pathArray[<span class="number">1</span>].contains(<span class="string">"/"</span>)) &#123; <span class="comment">//过滤子目录的视频</span></div><div class="line">                        HashMap&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;String, Object&gt;();</div><div class="line">                        map.put(MediaStore.Audio.Media.TITLE,</div><div class="line">                                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)));</div><div class="line">                        map.put(MediaStore.Audio.Media.MIME_TYPE,</div><div class="line">                                cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.MIME_TYPE)));</div><div class="line">                        map.put(KEY_EXTERNAL_CONTENT_URI, ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,</div><div class="line">                                cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))));</div><div class="line">                        map.put(<span class="string">"filedate"</span>,</div><div class="line">                                cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATE_TAKEN)));</div><div class="line">                        fileManagerVideoList.add(map);</div><div class="line">                    &#125;</div><div class="line">                &#125; <span class="keyword">while</span> (cursor.moveToNext());</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">            Log.d(TAG, <span class="string">"getFilePathVideoList: fail"</span>);</div><div class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</div><div class="line">        &#125; <span class="keyword">finally</span> &#123;</div><div class="line">            Log.d(TAG, <span class="string">"getVideoList: fileManagerVideoListSize::"</span> + fileManagerVideoList.size());</div><div class="line">            <span class="keyword">if</span> (cursor != <span class="keyword">null</span>)</div><div class="line">                cursor.close();</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="调节视频播放速度接口"><a href="#调节视频播放速度接口" class="headerlink" title="调节视频播放速度接口"></a>调节视频播放速度接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//f （0.5～2.0）</span></div><div class="line">mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(f));</div></pre></td></tr></table></figure>
+<h3 id="SharedPreferences使用"><a href="#SharedPreferences使用" class="headerlink" title="SharedPreferences使用"></a>SharedPreferences使用</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//存入</span></div><div class="line">SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);</div><div class="line">mSharedPreferences.edit().putInt(<span class="string">"search_position"</span>, <span class="number">1</span>).commit();</div><div class="line"><span class="comment">//取出</span></div><div class="line">SharedPreferences mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);</div><div class="line"><span class="keyword">int</span> serachIndex = mSharedPreferences.getInt(<span class="string">"serach_area_tip"</span>, <span class="number">0</span>);</div><div class="line"></div><div class="line"><span class="comment">//跨应用取值</span></div><div class="line"><span class="comment">//写入com.test.app</span></div><div class="line">SharedPreferences preferences = mContext.getSharedPreferences(<span class="string">"other_app_tag"</span>, Context.MODE_WORLD_READABLE|Context.MODE_WORLD_WRITEABLE|Context.MODE_MULTI_PROCESS);</div><div class="line">Editor editor = preferences.edit();</div><div class="line">editor.putLong(<span class="string">"keyword"</span>, value);</div><div class="line">editor.clear().commit();</div><div class="line"><span class="comment">//取值</span></div><div class="line"><span class="keyword">try</span> &#123;</div><div class="line">		Context contextFromGallery = <span class="keyword">null</span>;</div><div class="line">		contextFromApp = createPackageContext(</div><div class="line">				<span class="string">"com.test.app"</span>, MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE | MODE_MULTI_PROCESS);</div><div class="line">		SharedPreferences sp = contextFromApp</div><div class="line">				.getSharedPreferences(<span class="string">"other_app_tag"</span>,</div><div class="line">						MODE_WORLD_READABLE | MODE_WORLD_WRITEABLE | MODE_MULTI_PROCESS);</div><div class="line">		vaule = sp.getLong(<span class="string">"keyword"</span>, <span class="number">0</span>);</div><div class="line">		Log.d(TAG, getUri + <span class="string">" value = "</span> + vaule);</div><div class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;</div><div class="line">		Log.d(TAG, <span class="string">"com.test.app Package not found!"</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="格式化文件大小"><a href="#格式化文件大小" class="headerlink" title="格式化文件大小"></a>格式化文件大小</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title">formateFileSize</span><span class="params">(<span class="keyword">long</span> fileSize)</span> </span>&#123;</div><div class="line">DecimalFormat dFormat = <span class="keyword">new</span> DecimalFormat(<span class="string">"#.00"</span>);</div><div class="line">String fileSizeString = <span class="string">""</span>;</div><div class="line">String wrongString = <span class="string">"0 B"</span>;</div><div class="line"><span class="keyword">if</span> (fileSize == <span class="number">0</span>) &#123;</div><div class="line">  <span class="keyword">return</span> wrongString;</div><div class="line">&#125;</div><div class="line"><span class="keyword">if</span> (fileSize &lt; <span class="number">1024</span>) &#123;</div><div class="line">  fileSizeString = dFormat.format((<span class="keyword">double</span>)fileSize) +<span class="string">" B"</span>;</div><div class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (fileSize &lt; <span class="number">1048576</span>) &#123;</div><div class="line">  fileSizeString = dFormat.format((<span class="keyword">double</span>)fileSize/<span class="number">1024</span>) + <span class="string">" KB"</span>;</div><div class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (fileSize &lt; <span class="number">1073741824</span>) &#123;</div><div class="line">  fileSizeString = dFormat.format((<span class="keyword">double</span>)fileSize/<span class="number">1024</span>/<span class="number">1024</span>) + <span class="string">" MB"</span>;</div><div class="line">&#125; <span class="keyword">else</span> &#123;</div><div class="line">  fileSizeString = dFormat.format((<span class="keyword">double</span>)fileSize/<span class="number">1024</span>/<span class="number">1024</span>/<span class="number">1024</span>) + <span class="string">" GB"</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">return</span> fileSizeString;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="格式化时间"><a href="#格式化时间" class="headerlink" title="格式化时间"></a>格式化时间</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">formatDuration</span><span class="params">( <span class="keyword">int</span> duration)</span> </span>&#123;</div><div class="line">     <span class="keyword">int</span> h = duration / <span class="number">3600</span>;</div><div class="line">     <span class="keyword">int</span> m = (duration - h * <span class="number">3600</span>) / <span class="number">60</span>;</div><div class="line">     <span class="keyword">int</span> s = duration - (h * <span class="number">3600</span> + m * <span class="number">60</span>);</div><div class="line">     String durationValue;</div><div class="line">     String wrongString = <span class="string">"00:00:00"</span>;</div><div class="line">     <span class="keyword">if</span> (duration == <span class="number">0</span>) &#123;</div><div class="line">   <span class="keyword">return</span> wrongString;</div><div class="line"> &#125;</div><div class="line">     <span class="keyword">if</span> (h == <span class="number">0</span>) &#123;</div><div class="line">         <span class="keyword">if</span> (m == <span class="number">0</span> &amp;&amp; s == <span class="number">0</span>) s = <span class="number">1</span>;<span class="comment">//[BUGFIX]-Modify by TCTNJ,su.jiang, 2016-03-09,PR1759891</span></div><div class="line">         durationValue = String.format(<span class="string">"00:%02d:%02d"</span>, m, s);</div><div class="line">     &#125; <span class="keyword">else</span> &#123;</div><div class="line">         durationValue = String.format(<span class="string">"%d:%02d:%02d"</span>, h, m, s);</div><div class="line">     &#125;</div><div class="line">     <span class="keyword">return</span> durationValue;</div><div class="line"> &#125;</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+<blockquote class="blockquote-center">
+    <p>如果您觉得本博客还不错，欢迎继续关注本博客，欢迎多提宝贵意见，非常感谢！</p>
+</blockquote>
+<span id="inline-green" style="border-radius:3px;">作者</span>：
+<a class="link-blue" href="https://techgid.github.io" target="_blank">Jam</a>
+有问题请 <a class="link-blue" href="https://techgid.github.io/about/">留言</a>
+或者私信我的 <a class="link-blue" href="http://weibo.com/523927898" target="_blank">微博</a>。
+<div style="text-align:center; color:#ccc; font-size:14px; ">
+ ------本文结束
+ &nbsp;<i class="fa fa-paw"></i>&nbsp;
+ 感谢阅读------
+</div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+  <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+    <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+    <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+      <span>赏</span>
+    </button>
+    <div id="QR" style="display: none;">
+      
+        <div id="wechat" style="display: inline-block">
+          <img id="wechat_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/wechat_pay.png" alt="Jam WeChat Pay"/>
+          <p>微信打赏</p>
+        </div>
+      
+      
+        <div id="alipay" style="display: inline-block">
+          <img id="alipay_qr" src="http://ofywot861.bkt.clouddn.com/image/pay/ali_pay.png" alt="Jam Alipay"/>
+          <p>支付宝打赏</p>
+        </div>
+      
+    </div>
+  </div>
+
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+    <!--
+      
+        <div class="post-tags">
+          
+            <a href="/tags/工作笔记/" rel="tag"># 工作笔记</a>
+          
+            <a href="/tags/学习笔记/" rel="tag"># 学习笔记</a>
+          
+        </div>
+      
+      -->
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/22/js-version/" rel="next" title="Example Post">
+                <i class="fa fa-chevron-left"></i> Example Post
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/11/25/js-module-loader/" rel="prev" title="Example Post with Code Highlight">
+                Example Post with Code Highlight <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="cloud-tie-wrapper" class="cloud-tie-wrapper"></div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="http://ofywot861.bkt.clouddn.com/head.jpg"
+               alt="Jam" />
+          <p class="site-author-name" itemprop="name">Jam</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/">
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tag/index.html">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/techgid" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://twitter.com/jamgogo" target="_blank" title="Twitter">
+                  
+                    <i class="fa fa-fw fa-twitter"></i>
+                  
+                  Twitter
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/jamhu" target="_blank" title="微博">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  微博
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Timer-Task-hanlder-案例应用"><span class="nav-number">1.</span> <span class="nav-text">Timer Task hanlder 案例应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android窗口打开动画"><span class="nav-number">2.</span> <span class="nav-text">Android窗口打开动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据当前文件获取当前目录"><span class="nav-number">3.</span> <span class="nav-text">根据当前文件获取当前目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#查询当前目录下的所有视频不包括子目录"><span class="nav-number">4.</span> <span class="nav-text">查询当前目录下的所有视频不包括子目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调节视频播放速度接口"><span class="nav-number">5.</span> <span class="nav-text">调节视频播放速度接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SharedPreferences使用"><span class="nav-number">6.</span> <span class="nav-text">SharedPreferences使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#格式化文件大小"><span class="nav-number">7.</span> <span class="nav-text">格式化文件大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#格式化时间"><span class="nav-number">8.</span> <span class="nav-text">格式化时间</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2016 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jam</span>
+</div>
+
+
+<div class="powered-by">
+  Power by GitPages
+</div>
+
+<div class="theme-info">
+   O(∩_∩)O~
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+    
+    <script>
+      var cloudTieConfig = {
+        url: document.location.href, 
+        sourceId: "",
+        productKey: "852f2aeb652c410baaa3c8ad8b29f749",
+        target: "cloud-tie-wrapper"
+      };
+    </script>
+    <script src="https://img1.ws.126.net/f2e/tie/yun/sdk/loader.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  
+  
+  <link rel="stylesheet" href="/lib/algolia-instant-search/instantsearch.min.css">
+
+  
+  
+  <script src="/lib/algolia-instant-search/instantsearch.min.js"></script>
+  
+
+  <script src="/js/src/algolia-search.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
+<!-- 动态背景 -->
+<script type="text/javascript" src="/js/src/particle.js"></script>
+<script type="text/javascript" src="/js/src/particle.js" count="50" zindex="-2" opacity="1" color="0,104,183"></script>
+<!-- 小红心 -->
+<script type="text/javascript" src="/js/src/love.js"></script>
