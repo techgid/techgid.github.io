@@ -94,7 +94,7 @@
 <meta property="og:url" content="http://techgid.github.io/2017/04/23/android-mount/index.html">
 <meta property="og:site_name" content="Jam&#39;s Blog">
 <meta property="og:description" content="概述在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。  参考源码： AndroidXref N">
-<meta property="og:updated_time" content="2017-07-18T06:49:37.000Z">
+<meta property="og:updated_time" content="2017-07-19T02:12:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="android mount 简单分析">
 <meta name="twitter:description" content="概述在某些情况下挂着分区时需要单独做挂载的特性处理，比如小内存优化时，mount时不需要discard特性。因此我们在mount时做判断，符合条件加上相关特性，不符合则去除。这需要确定两点，首先我们要清楚mount流程，用来确定在什么地方做判断最合适。其次明确判断条件，mount data时是该版本去除discard属性，不是该版本保留discard属性。  参考源码： AndroidXref N">
@@ -218,6 +218,16 @@
               <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
             分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
           </a>
         </li>
       
@@ -629,7 +639,7 @@
 
           
             <div class="site-state-item site-state-posts">
-              <a href="/">
+              <a href="/archives">
                 <span class="site-state-item-count">13</span>
                 <span class="site-state-item-name">日志</span>
               </a>
@@ -652,7 +662,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tag/index.html">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
