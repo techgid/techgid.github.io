@@ -1,5 +1,6 @@
 ---
 title: Hello World
+date: 2016-07-23 22:47:52
 categories:
     - Post Example
 ---
