@@ -39,7 +39,7 @@ seo: false
 menu:
   home: /
   categories: /categories
-  #archives: /archives
+  archives: /archives
   tags: /tag
   about: /about
   #sitemap: /sitemap.xml

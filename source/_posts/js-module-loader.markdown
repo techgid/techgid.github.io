@@ -9,8 +9,7 @@ header-img: "post-bg-js-module.jpg"
 categories:
     - Post Example
 tags:
-    - 前端开发
-    - JavaScript
+    - 前端简述
 ---
 
 
